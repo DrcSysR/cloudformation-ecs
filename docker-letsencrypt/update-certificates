@@ -1,0 +1,16 @@
+#!/bin/bash
+
+while true; do
+    . /assume-role ${AWS_DEV_ACCOUNT_ID} ${AWS_ROLE} discard
+
+    aws s3 sync s3://${S3_BUCKET_NAME}/letsencrypt/accounts /etc/dehydrated/accounts
+    aws s3 sync s3://${S3_BUCKET_NAME}/letsencrypt/certificates/ /etc/ssl/${ENV_NAME}.${ROUTE53_ZONE}
+
+    if [[ "$(ls -A /etc/dehydrated/accounts/)" == "" ]]; then
+        dehydrated --register --accept-terms
+        aws s3 sync /etc/dehydrated/accounts s3://${S3_BUCKET_NAME}/letsencrypt/accounts
+    fi
+
+    dehydrated --cron --domain ${ENV_NAME}.${ROUTE53_ZONE}
+    sleep 1296000
+done
