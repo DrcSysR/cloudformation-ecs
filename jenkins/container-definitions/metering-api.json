@@ -1,0 +1,20 @@
+{
+    "name": "$CONTAINER_NAME",
+    "image": "$IMAGE",
+    "essential": true,
+    "memoryReservation": 512,
+    "portMappings": [
+        {
+            "hostPort": 9000,
+            "containerPort": 9000
+        }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "$ENV_NAME-LG",
+            "awslogs-region": "$AWS_DEFAULT_REGION",
+            "awslogs-stream-prefix": "$CONTAINER_NAME"
+        }
+    }
+}
