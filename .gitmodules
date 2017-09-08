@@ -1,0 +1,3 @@
+[submodule "ecr-cleanup-lambda"]
+	path = ecr-cleanup-lambda
+	url = https://github.com/awslabs/ecr-cleanup-lambda
