@@ -1,0 +1,15 @@
+Description: >
+
+    Template for route53.
+
+Resources:
+
+    Route53Record:
+        Type: AWS::Route53::RecordSet
+        Properties:
+            HostedZoneId: ${ROUTE53_ZONE_ID}
+            Name: ${ENV_NAME}.${ROUTE53_ZONE}
+            Type: CNAME
+            TTL: '300'
+            ResourceRecords:
+                - ${ALB_URL}

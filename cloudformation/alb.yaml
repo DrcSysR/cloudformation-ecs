@@ -1,0 +1,72 @@
+Description: >
+    An Application Load Balancer template.
+
+Parameters:
+
+    EnvironmentName:
+        Description: An environment name
+        Type: String
+
+    VPC:
+        Type: AWS::EC2::VPC::Id
+        Description: VPC the Applicaion Load Balancer will be deployed to
+
+    Subnets:
+        Description: Subnets the Applicaion Load Balancer will be deployed to
+        Type: List<AWS::EC2::Subnet::Id>
+
+    SecurityGroup:
+        Description: Security Group to apply to the Applicaion Load Balancer
+        Type: AWS::EC2::SecurityGroup::Id
+
+Resources:
+
+    LoadBalancer:
+        Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+        Properties:
+            Name: !Ref EnvironmentName
+            Subnets: !Ref Subnets
+            SecurityGroups:
+                - !Ref SecurityGroup
+            Tags:
+                - Key: Name
+                  Value: !Join [ "-", [ alb, $ENV_NAME, !Ref EnvironmentName] ]
+                - Key: Env
+                  Value: !Ref EnvironmentName
+
+    LoadBalancerListener:
+        Type: AWS::ElasticLoadBalancingV2::Listener
+        Properties:
+            LoadBalancerArn: !Ref LoadBalancer
+            Port: 80
+            Protocol: HTTP
+            DefaultActions:
+                - Type: forward
+                  TargetGroupArn: !Ref DefaultTargetGroup
+
+    DefaultTargetGroup:
+        Type: AWS::ElasticLoadBalancingV2::TargetGroup
+        Properties:
+            Name: ${ENV_NAME}-default
+            VpcId: !Ref VPC
+            Port: 80
+            Protocol: HTTP
+            HealthCheckIntervalSeconds: 15
+            HealthCheckTimeoutSeconds: 5
+            UnhealthyThresholdCount: 5
+
+Outputs:
+
+    LoadBalancer:
+        Description: A reference to the Application Load Balancer
+        Value: !Ref LoadBalancer
+
+    LoadBalancerUrl:
+        Description: ALB URL
+        Value: !GetAtt LoadBalancer.DNSName
+        Export:
+            Name: "alb-url-${ENV_NAME}"
+
+    Listener:
+        Description: A reference to a port 80 listener
+        Value: !Ref LoadBalancerListener

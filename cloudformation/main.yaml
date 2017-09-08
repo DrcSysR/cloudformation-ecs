@@ -1,0 +1,58 @@
+Description: >
+
+    Template for deploying ECS cluster into isolated VPC environment.
+
+Resources:
+
+    VPC:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3-eu-west-1.amazonaws.com/cf-templates-$ENV_NAME/vpc.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+
+    SecurityGroups:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3-eu-west-1.amazonaws.com/cf-templates-$ENV_NAME/sg.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+                VPC: !GetAtt VPC.Outputs.VPC
+
+    ECS:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3-eu-west-1.amazonaws.com/cf-templates-$ENV_NAME/ecs.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+                InstanceType: $InstanceType
+                ClusterSize: $ClusterSize
+                VPC: !GetAtt VPC.Outputs.VPC
+                SecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup
+                Subnets: !GetAtt VPC.Outputs.PublicSubnets
+                Listener: !GetAtt ALB.Outputs.Listener
+
+    ALB:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3-eu-west-1.amazonaws.com/cf-templates-$ENV_NAME/alb.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+                VPC: !GetAtt VPC.Outputs.VPC
+                Subnets: !GetAtt VPC.Outputs.PublicSubnets
+                SecurityGroup: !GetAtt SecurityGroups.Outputs.LoadBalancerSecurityGroup
+
+    S3:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: $ENV_NAME-storage-$ENV_NAME
+
+    S3AWSNormalized:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: $ENV_NAME-aws-normalised-$ENV_NAME
+
+    S3AWSRaw:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: $ENV_NAME-aws-raw-$ENV_NAME
