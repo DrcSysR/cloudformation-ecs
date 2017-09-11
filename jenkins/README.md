@@ -44,3 +44,6 @@ The below is a list of parameters/environment variables used in a Jenkins job:
 - `SERVICE_URL` - Root path to Service URL.
 - `SERVICE_CORE_API` - Local API Endpoint.
 - `ROUTE53_ZONE` - Application domain.
+- `MYSQL_PORT_3306_TCP_ADDR` - MySQL endpoint (127.0.01 by default);
+- `MYSQL_PORT_3306_TCP_PORT` - MySQL port (3306 by default);
+- `MYSQL_ENV_MYSQL_ROOT_PASSWORD` - MySQL root password.
