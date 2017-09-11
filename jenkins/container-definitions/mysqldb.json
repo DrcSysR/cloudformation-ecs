@@ -1,0 +1,20 @@
+{
+    "name": "$CONTAINER_NAME",
+    "image": "$IMAGE",
+    "essential": true,
+    "memoryReservation": 512,
+    "portMappings": [
+        {
+            "hostPort": 3306,
+            "containerPort": 3306
+        }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "$ENV_NAME-LG",
+            "awslogs-region": "$AWS_DEFAULT_REGION",
+            "awslogs-stream-prefix": "$CONTAINER_NAME"
+        }
+    }
+}
