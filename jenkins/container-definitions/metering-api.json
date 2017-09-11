@@ -3,6 +3,7 @@
     "image": "$IMAGE",
     "essential": true,
     "memoryReservation": 512,
+    "links": ["mysql"],
     "portMappings": [
         {
             "hostPort": 9000,
